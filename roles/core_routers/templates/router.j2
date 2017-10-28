@@ -1,0 +1,18 @@
+set interfaces {{ item.user_int }} flexible-vlan-tagging
+set interfaces {{ item.user_int }} mtu 1522
+set interfaces {{ item.user_int }} encapsulation flexible-ethernet-services
+set interfaces {{ item.user_int }} unit {{ item.user_vlan }} description {{ vrf_name }}
+set interfaces {{ item.user_int }} unit {{ item.user_vlan }} vlan-id {{ item.user_vlan }}
+set interfaces {{ item.user_int }} unit {{ item.user_vlan }} family inet address {{ item.user_int_net }}.1/{{ item.user_int_mask }}
+
+set interfaces lo0 unit {{ item.user_vlan }} description "{{ vrf_name }} loopback"
+set interfaces lo0 unit {{ item.user_vlan }} family inet address {{ item.vrf_lo0 }}/32
+
+set routing-instances {{ vrf_name }} instance-type vrf
+set routing-instances {{ vrf_name }} interface lo0.{{ item.user_vlan }}
+set routing-instances {{ vrf_name }} interface {{ item.user_int }}.{{ item.user_vlan }}
+set routing-instances {{ vrf_name }} route-distinguisher {{ item.lo0_ip }}:{{ route_target }}
+set routing-instances {{ vrf_name }} vrf-target import target:{{ asn }}:{{ route_target }}
+set routing-instances {{ vrf_name }} vrf-target export target:{{ asn }}:{{ route_target }}
+set routing-instances {{ vrf_name }} vrf-table-label
+set routing-instances {{ vrf_name }} routing-options auto-export
